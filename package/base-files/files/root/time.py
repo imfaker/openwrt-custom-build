@@ -1,4 +1,3 @@
-
 from encodings.utf_8 import encode
 from enum import Enum
 from http.client import HTTPException
@@ -42,9 +41,9 @@ logger.addHandler(filelog)
 # 按时间切分
 # logging.handlers.TimedRotatingFileHandler(filename="all.log", when='S', interval=1, backupCount=3,encoding='utf-8')
 
-loopTime = 15
+loopTime = 60
 delay_minutes=40
-host='https://notify.cloudtu.cn/notify'
+host='http://mifankeji.cn/api/notify'
 thread_list=[]
 print('python_version' + platform.python_version())
 
