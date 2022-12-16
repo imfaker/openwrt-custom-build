@@ -79,7 +79,7 @@ ucidef_set_compat_version() {
 }
 
 ucidef_set_interface_lan() {
-	ucidef_set_interface "lan" device "$1" protocol "${2:-static}"
+	ucidef_set_interface "lsan" device "$1" protocol "${2:-dhcp}"
 }
 
 ucidef_set_interface_wan() {
