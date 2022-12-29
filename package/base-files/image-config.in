@@ -27,7 +27,7 @@ config TARGET_PREINIT_SUPPRESS_STDERR
 config TARGET_PREINIT_DISABLE_FAILSAFE
 	bool
 	prompt "Disable failsafe" if PREINITOPT
-	default n
+	default y
 	help
 		Disable failsafe mode.  While it is very handy while
 		experimenting or developing it really ought to be
