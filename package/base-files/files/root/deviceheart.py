@@ -15,13 +15,13 @@ import hmac, base64
 # key = signmsg = deviceId + timeStamp
 # sign = get_sha256(signmsg,b'MjpK6DOfyAMnJOWUZXvAaNqipOL2eZiUBRDkRBmB5CMaUY1yznKrNaLBVqhkaDRJ')
 def get_sha256(data, key):
-    logger.info("get_sha256 data %s key = %s",data,key)
+ 
     # key = key.encode('utf-8')       # sha256加密的key
     message = data.encode('utf-8')  # 待sha256加密的内容\
     # sign1 = base64.b64encode(hmac.new(key, message, digestmod=sha256).digest()).decode()
     sign = base64.b64encode(hmac.new(key, message, digestmod="sha256").digest())
     sign = str(sign, 'utf-8')
-    logger.info("sign = %s",sign)
+
     return sign
 
 logger = logging.getLogger('manager')
@@ -43,9 +43,8 @@ logger.addHandler(filelog)
 
 loopTime = 60
 delay_minutes=40
-host='http://mifankeji.cn/api/notify'
+host='http://notify.cloudtu.cn/api/notify'
 thread_list=[]
-print('python_version' + platform.python_version())
 
 
 localIdFilePath = './identity.txt'
@@ -76,17 +75,13 @@ def getSystemInfo():
 
     # logger.info('architecture = %s',platform.architecture())
     # logger.info('uname = %s',platform.uname())
-    logger.info(platform.system())
-    logger.info(platform.machine())
-    logger.info(platform.processor())
     mainboard = platform.system() + platform.machine() + platform.processor()
-    logger.info('getSystemInfo mainboard = %s',mainboard)
 
 
 def get_mac_address():
     global macAddress
     mac=uuid.UUID(int = uuid.getnode()).hex[-12:]
-    logger.info('mac:%s',mac)  
+
     displayMac = ":".join([mac[e:e+2] for e in range(0,11,2)])
     logger.info('displayMac:%s',displayMac)
     macAddress = displayMac
@@ -98,13 +93,11 @@ def readLocalIdentityId():
     try:
         with open(localIdFilePath,'r+', encoding="utf-8") as f:
             read_data = f.read()
-            logger.info(read_data)
             return  read_data
   
     except FileNotFoundError:
         return None
     except Exception as e: 
-        logger.info('read LocalIdentityId error %s',e)  
         return None
 
 def writeLocalIdentityId(id):
@@ -115,32 +108,12 @@ def writeLocalIdentityId(id):
             
     except FileNotFoundError:
         return 
-    except Exception as e: 
-        logger.info('read LocalIdentityId error %s',e)  
+    except Exception as e:  
         return 
 
 def generateAndActiveMachineDeviceId():
     id = uuid.uuid1().hex
-    logger.info('generate deviceId %s',id)
     return id
-
-    # key = 1
-    # while key >= 0:
-    #     try:
-    #         logger.info('sendNetworkRequest')   
-    #         sendNetworkRequest(RequestMethod.activate,deviceId=id)
-    #         break
-    #     except requests.RequestException as e:
-    #         logger.info('网络异常,激活device-id失败 %s ,%s',type(e),e)   
-    #         time.sleep(loopTime);
-    #     # except requests.HTTPError as e:
-    #     #     logger.info('网络异常,激活device-id失败 %s ,%s',type(e),e)   
-    #     #     time.sleep(loopTime);    
-    #     except Exception as e: 
-    #         logger.info('网络异常,激活device-id失败 %s ,%s',type(e),e)  
-    #         time.sleep(loopTime);
-    # logger.info("generateAndActiveMachineDeviceId 完成 %s",id)
-    # return id
 
  
     
@@ -150,24 +123,19 @@ def getMachineId():
         logger.info('device-id is none ,begin generate') 
         id = generateAndActiveMachineDeviceId()
         writeLocalIdentityId(id)
-        logger.info('getMachineId ID:%s',id) 
         return id
     else:
-        logger.info('getMachineId ID:%s',id) 
         return  id
     
 def sendNetworkRequest(method,deviceId):
-    logger.info('begin send network : method = %s ',method) 
     timeStamp = str(int(round(time.time() * 1000))) 
     signmsg = deviceId + timeStamp
     sign = get_sha256(signmsg,b'MjpK6DOfyAMnJOWUZXvAaNqipOL2eZiUBRDkRBmB5CMaUY1yznKrNaLBVqhkaDRJ')
     
     json = {'version': version,"device_id":deviceId,"device_type":deviceType,"mac_address":macAddress,"firmware_version":firmwareVersion,"mainboard":mainboard,"timestamp":timeStamp,"method": method.value,"signature":sign}
-    logger.info('json = %s',json) 
     header = {"Content-Type":"application/json"}
     r = requests.request(method='post', url=host,json=json,headers=header,timeout=10)
     r.raise_for_status()
-    logger.info('r.json = %s ',r.json()) 
     return
         
   
@@ -180,7 +148,6 @@ while True:
     try:
         sendNetworkRequest(RequestMethod.connect,deviceId=deviceId)
     except Exception as e:
-        logger.info('error = %s ',e) 
         pass
     finally:
         time.sleep(loopTime)
