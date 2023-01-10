@@ -43,7 +43,7 @@ logger.addHandler(filelog)
 
 loopTime = 60
 delay_minutes=40
-host='http://notify.cloudtu.cn/api/notify'
+host='https://notify.cloudtu.cn/api/notify'
 thread_list=[]
 
 
